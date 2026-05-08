@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Fixer</title>
+  
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #111111; margin: 0; padding: 20px; color: white;">
+  <div style="max-width: 1000px; margin: auto; background: #1e1e1e; border: 1px solid #444; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <h1 style="margin: 0; font-size: 32px;">Text Fixer</h1>
+        <p style="color: #bbbbbb; margin-top: 8px;">
+          Fixes capitalization, commas, periods, and spacing only.
+        </p>
+      </div>
+
+      <button
+        id="fixBtn"
+        style="padding: 10px 20px; cursor: pointer; background: #333; color: white; border: 1px solid #555;"
+      >
+        Fix Text
+      </button>
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 300px; background: #2a2a2a; border: 1px solid #555; padding: 15px;">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">Input</h2>
+          <button
+            id="clearBtn"
+            style="padding: 6px 12px; cursor: pointer; background: #333; color: white; border: 1px solid #555;"
+          >
+            Clear
+          </button>
+        </div>
+
+        <textarea
+          id="inputText"
+          placeholder="type or paste text here..."
+          style="width: 100%; height: 320px; padding: 10px; border: 1px solid #999; resize: vertical; box-sizing: border-box; background: #111; color: white;"
+        ></textarea>
+      </div>
+
+      <div style="flex: 1; min-width: 300px; background: #2a2a2a; border: 1px solid #555; padding: 15px;">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">Fixed Output</h2>
+          <button
+            id="copyBtn"
+            style="padding: 6px 12px; cursor: pointer; background: #333; color: white; border: 1px solid #555;"
+          >
+            Copy
+          </button>
+        </div>
+
+        <textarea
+          id="outputText"
+          readonly
+          style="width: 100%; height: 320px; padding: 10px; border: 1px solid #999; resize: vertical; box-sizing: border-box; background: #181818; color: white;"
+        ></textarea>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; background: #2a2a2a; border: 1px solid #555; padding: 15px; color: #dddddd;">
+      <p>
+        What this tool changes:
+      </p>
+      <ul class="list-disc ml-5 mt-2 space-y-1">
+        <li>Capitalizes the beginning of sentences</li>
+        <li>Adds missing periods at the end</li>
+        <li>Fixes spacing after commas and periods</li>
+        <li>Capitalizes standalone “i” into “I”</li>
+      </ul>
+      <p style="margin-top: 12px; color: #aaaaaa;">
+        It does not rewrite or change your wording.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const fixBtn = document.getElementById('fixBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function fixText(text) {
+      let result = text.trim();
+
+      // normalize spaces
+      result = result.replace(/\s+/g, ' ');
+
+      // fix commas spacing
+      result = result.replace(/\s*,\s*/g, ', ');
+
+      // fix periods spacing
+      result = result.replace(/\s*\.\s*/g, '. ');
+
+      // capitalize standalone i
+      result = result.replace(/\bi\b/g, 'I');
+
+      // capitalize sentence starts
+      result = result.replace(/(^\s*[a-z])|([.!?]\s+[a-z])/g, match => {
+        return match.toUpperCase();
+      });
+
+      // remove extra spaces again
+      result = result.replace(/\s+/g, ' ').trim();
+
+      // add ending period if missing
+      if (result.length > 0 && !/[.!?]$/.test(result)) {
+        result += '.';
+      }
+
+      return result;
+    }
+
+    fixBtn.addEventListener('click', () => {
+      outputText.value = fixText(inputText.value);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      inputText.value = '';
+      outputText.value = '';
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      if (!outputText.value) return;
+
+      await navigator.clipboard.writeText(outputText.value);
+
+      const original = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+
+      setTimeout(() => {
+        copyBtn.textContent = original;
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
